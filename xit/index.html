@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>XIT: Exploration and Exploitation Informed Trees</title>
+  <meta name="description" content="Project page for XIT, a sampling-based informative path planner for active gas distribution mapping in unknown environments (IEEE Transactions on Robotics, 2026).">
+  <meta property="og:title" content="XIT: Exploration and Exploitation Informed Trees for Active Gas Distribution Mapping in Unknown Environments">
+  <meta property="og:description" content="Project page for XIT, a sampling-based informative path planner for active gas distribution mapping in unknown environments (IEEE Transactions on Robotics, 2026).">
+  <meta property="og:image" content="assets/xit_overview.png">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://malfazliu.github.io/xit/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <style>
+/* Layout: one centred reading column (760px prose, 1040px figures); centred paper header;
+   the figures sit on white plates so they read the same in both themes.
+   Tokens mirror malfazliu.com so the page can live at malfazliu.com/xit/. */
+:root {
+  --bg: #fafaf8; --bg-2: #f1f2ef; --ink: #141619; --muted: #5f656d; --rule: #e2e4e0; --card: #ffffff;
+  --accent: #1b7a4b; --accent-ink: #145c39; --accent-soft: #e4f2ea;
+  --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --sans: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace;
+  --prose: 760px; --wide: 1040px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1113; --bg-2: #15181b; --ink: #e9eae6; --muted: #9aa1a9; --rule: #252a2f; --card: #171a1e;
+    --accent: #62c892; --accent-ink: #8fdcb2; --accent-soft: #14291d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1113; --bg-2: #15181b; --ink: #e9eae6; --muted: #9aa1a9; --rule: #252a2f; --card: #171a1e;
+  --accent: #62c892; --accent-ink: #8fdcb2; --accent-soft: #14291d; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+img { max-width: 100%; height: auto; display: block; }
+sup { font-size: 0.68em; line-height: 0; }
+
+.wrap, .wide {
+  margin: 0 auto;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: calc(var(--prose) + 48px); }
+.wide { max-width: calc(var(--wide) + 48px); }
+
+/* header */
+.head { text-align: center; padding-block: 64px 36px; }
+.venue { margin: 0 0 18px; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.venue b { font-weight: 600; color: var(--accent-ink); }
+h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(1.7rem, 1.1rem + 2.4vw, 2.7rem); line-height: 1.15; letter-spacing: -0.015em; margin: 0 auto 22px; max-width: 900px; text-wrap: balance; }
+.authors { margin: 0 0 6px; font-size: 1.12rem; line-height: 1.5; }
+.authors span { white-space: nowrap; }
+.affil { margin: 0 auto 26px; color: var(--muted); font-size: 0.93rem; max-width: 760px; line-height: 1.5; }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.links a { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--rule); border-radius: 999px; padding: 7px 15px; color: var(--ink); font-size: 0.93rem; font-weight: 500; background: var(--card); transition: border-color 0.15s, color 0.15s; }
+.links a:hover { border-color: var(--accent); color: var(--accent-ink); text-decoration: none; }
+.links svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* figures */
+.plate { background: #ffffff; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.plate img { width: 100%; }
+figure { margin: 0; }
+figcaption, .cap { color: var(--muted); font-size: 0.9rem; line-height: 1.55; margin: 12px 4px 0; }
+figcaption b, .cap b { color: var(--ink); font-weight: 600; }
+.teaser { padding-block: 8px 0; }
+
+/* sections */
+section { padding-block: 52px 0; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 1.55rem; letter-spacing: -0.01em; margin: 0 0 18px; line-height: 1.2; }
+h2::after { content: ""; display: block; width: 36px; height: 2px; background: var(--accent); margin-top: 10px; border-radius: 1px; }
+section p { margin: 0 0 14px; }
+.abstract p { font-size: 1.02rem; text-wrap: pretty; }
+
+/* video */
+.video-box { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--rule); }
+.video-box iframe, .video-box a, .video-box img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-box img { object-fit: cover; }
+.video-box a { display: block; }
+.video-box .play { position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; transform: translate(-50%, -50%); border-radius: 50%; background: rgba(20, 22, 25, 0.78); display: grid; place-items: center; transition: background 0.15s, transform 0.15s; }
+.video-box .play svg { width: 28px; height: 28px; fill: #ffffff; margin-left: 4px; }
+.video-box a:hover .play { background: var(--accent); transform: translate(-50%, -50%) scale(1.05); }
+.video-box a:focus-visible { outline-offset: -3px; }
+
+/* overview panels */
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.panels figure { min-width: 0; }
+.panels figcaption { margin-top: 10px; }
+
+/* contributions */
+.contrib { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.contrib li { display: grid; grid-template-columns: 10px 1fr; gap: 16px; align-items: start; padding: 0; }
+.contrib li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 0.55em; }
+.contrib b { font-weight: 600; }
+
+/* bibtex */
+.bib { position: relative; background: var(--bg-2); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; overflow-x: auto; }
+.bib pre { margin: 0; font: 0.84rem/1.55 var(--mono); color: var(--ink); white-space: pre; }
+.bib button { position: absolute; top: 10px; right: 10px; font: 500 0.8rem var(--sans); color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 7px; padding: 5px 11px; cursor: pointer; }
+.bib button:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+footer { margin-top: 72px; padding-block: 24px 56px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.86rem; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
+
+@media (max-width: 720px) {
+  .head { padding-block: 44px 28px; }
+  .panels { grid-template-columns: 1fr; }
+  section { padding-block: 40px 0; }
+  .wrap, .wide { padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+}
+@media print { .plate, .video-box, .panels figure, .bib, .teaser { break-inside: avoid; } h2 { break-after: avoid; } body { background: #ffffff; color: #141619; } .bib button { display: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="wrap">
+    <p class="venue">Accepted for publication in <b>IEEE Transactions on Robotics</b>, 2026</p>
+    <h1>XIT: Exploration and Exploitation Informed Trees for Active Gas Distribution Mapping in Unknown Environments</h1>
+    <p class="authors">
+      <span>Mal Fazliu<sup>1</sup></span>, <span>Matthew Coombes<sup>1</sup></span>, <span>Sen Wang<sup>2</sup></span>, <span>Cunjia Liu<sup>1</sup></span>
+    </p>
+    <p class="affil"><sup>1</sup>Department of Aeronautical and Automotive Engineering, Loughborough University, UK<br>
+      <sup>2</sup>Department of Electrical and Electronic Engineering, Imperial College London, UK</p>
+    <ul class="links">
+      <li><a href="https://arxiv.org/abs/2602.13739" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Paper (arXiv)</a></li>
+      <li><a href="https://github.com/malfazliu/XIT-Planner-Exploration-and-Exploitation-Informed-Trees-" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Code</a></li>
+      <li><a href="https://youtu.be/j_Bmpg7GrNY" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5v15l14-7.5z"/></svg>Video</a></li>
+      <li><a href="#bibtex"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7H6a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 1-2 2M20 7h-4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 1-2 2"/></svg>BibTeX</a></li>
+    </ul>
+  </div>
+</header>
+
+<figure class="teaser wide">
+  <div class="plate"><img src="assets/xit_overview.png" alt="Illustration of a ground robot in a partially mapped cluttered environment with a low-concentration zone, a high-concentration zone, an occupancy frontier, a gas frontier, three candidate paths and the next-best trajectory highlighted"></div>
+  <figcaption>A robot constructs a gas distribution map from concentration measurements in real time while XIT plans gas-exploitative, distance-aware trajectories toward both gas frontiers and environmental frontiers. Candidate paths are shown in grey; the <b>next-best trajectory (NBT)</b>, the path with the highest expected information value, is highlighted in green.</figcaption>
+</figure>
+
+<main>
+  <section id="abstract" class="wrap abstract">
+    <h2>Abstract</h2>
+    <p>Mobile robotic gas distribution mapping (GDM) provides critical situational awareness during emergency responses to hazardous gas releases. However, most systems still rely on teleoperation, limiting scalability and response speed. Autonomous active GDM is challenging in unknown and cluttered environments, because the robot must simultaneously explore traversable space, map the environment, and infer the gas distribution belief from sparse chemical measurements. We address this by formulating active GDM as a next-best-trajectory informative path planning (IPP) problem and propose XIT (Exploration and Exploitation Informed Trees), a sampling-based planner that balances exploration and exploitation by generating concurrent trajectories toward exploration-rich goals while collecting informative gas measurements en route. XIT draws a batch of samples from an Upper Confidence Bound (UCB) information field derived from the current gas posterior and expands trees using a cost that trades off travel effort against information acquisition. To enable plume-aware exploration, we introduce the gas frontier concept, defined as unobserved regions adjacent to high gas concentrations, and propose the Wavefront Gas Frontier Detection (WGFD) algorithm for their identification. High-fidelity simulations demonstrate the benefits of XIT in terms of GDM quality and efficiency, and a scaled real-world experiment demonstrates its practicality. Although developed for active GDM, XIT is applicable to other robotic information-gathering tasks in unknown environments that face the exploration and exploitation trade-off.</p>
+  </section>
+
+  <section id="video" class="wide">
+    <h2>Video</h2>
+    <div class="video-box">
+        <a id="video-link" href="https://youtu.be/j_Bmpg7GrNY" target="_blank" rel="noopener" aria-label="Play the experiment video on YouTube">
+          <img src="assets/video_poster.jpg" alt="Still from the experiment video: the TurtleBot3 in the test arena beside the live gas map and XIT paths">
+          <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5v15l14-7.5z"/></svg></span>
+        </a>
+    </div>
+    <p class="cap">Real-world trial in a 5.0&nbsp;m × 3.7&nbsp;m scaled indoor gas-leak arena with two CO<sub>2</sub> sources and fan-driven airflow. A TurtleBot3 with a CO<sub>2</sub> sensor runs XIT-GFF with the UCB cost in closed loop, from occupancy exploration through gas-frontier probing to a final gas-exploitative trajectory. Submitted with the paper as supplementary material.</p>
+  </section>
+
+  <section id="overview" class="wide">
+    <h2>Overview</h2>
+    <div class="panels">
+      <figure>
+        <div class="plate"><img src="assets/system_architecture.png" alt="Block diagram of the mobile robotic platform: perception and chemical sensors feed SLAM and the GDM function, which feed the IPP module; the IPP module outputs the next-best trajectory to path following"></div>
+        <figcaption><b>(a) System architecture.</b> Localisation and mapping (SLAM) supply the robot pose and occupancy grid map, the GDM function supplies the gas map information, and the IPP module selects the next-best trajectory, which is executed by the path-following controller.</figcaption>
+      </figure>
+      <figure>
+        <div class="plate"><img src="assets/ipp_process.png" alt="Diagram of the IPP process: environment, gas distribution model and UCB information map on the left; exploration functions (gas frontiers and occupancy frontiers), initialisation with explorative goals and informed batch sampling, and exploitative tree expansion with an information-distance cost on the right"></div>
+        <figcaption><b>(b) IPP process.</b> Gas frontiers (yellow) along the boundary of the estimated plume and conventional frontiers (red) outlining the unknown occupancy map provide the goal regions that steer and terminate tree expansion. A batch of samples is drawn from the UCB information field, and a UCB-distance cost function derived from the current gas model guides the trees through inferred high-value gas areas.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="contributions" class="wrap">
+    <h2>Contributions</h2>
+    <ul class="contrib">
+      <li><span><b>XIT</b>, a sampling-based IPP planner that constructs multi-goal informed trees over a UCB-based information field to trade off information acquisition and travel cost, with graph optimality on fixed sample-induced graphs and probabilistic completeness and asymptotic optimality established under the stated assumptions.</span></li>
+      <li><span>To our knowledge, the first <b>active GDM system</b> that jointly reasons about environmental exploration, gas structure exploration, and gas exploitation, evaluated in high-fidelity simulation and demonstrated in a scaled real-world gas-release experiment.</span></li>
+      <li><span><b>Gas frontier</b>, a novel concept for detecting plume boundaries to support plume-aware exploration, and the Wavefront Gas Frontier Detection (WGFD) algorithm for their identification.</span></li>
+    </ul>
+  </section>
+
+  <section id="bibtex" class="wrap">
+    <h2>BibTeX</h2>
+    <div class="bib">
+      <button id="copy-bib" type="button">Copy</button>
+      <pre id="bib-text">@article{Fazliu2026XIT,
+  title   = {{XIT}: Exploration and Exploitation Informed Trees for Active Gas
+             Distribution Mapping in Unknown Environments},
+  author  = {Fazliu, Mal and Coombes, Matthew and Wang, Sen and Liu, Cunjia},
+  journal = {IEEE Transactions on Robotics},
+  year    = {2026},
+  note    = {Accepted for publication. Preprint: arXiv:2602.13739}
+}</pre>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Contact: m.fazliu2@lboro.ac.uk</span>
+    <span>Loughborough University · Imperial College London</span>
+  </div>
+</footer>
+
+<script id="yt-embed">
+(function () {
+  var a = document.getElementById('video-link');
+  if (!a) return;
+  a.addEventListener('click', function (e) {
+    e.preventDefault();
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/j_Bmpg7GrNY?autoplay=1&rel=0';
+    f.title = 'XIT experiment video';
+    f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    f.allowFullscreen = true;
+    a.replaceWith(f);
+  });
+})();
+</script>
+<script>
+(function () {
+  var b = document.getElementById('copy-bib'), pre = document.getElementById('bib-text');
+  if (!b || !pre) return;
+  b.addEventListener('click', function () {
+    var t = pre.textContent;
+    function done() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = 'Selected: press Ctrl+C'; setTimeout(function () { b.textContent = 'Copy'; }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done, fallback); }
+    else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
